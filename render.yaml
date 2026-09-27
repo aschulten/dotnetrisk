@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: dotnetrisk-aschulten
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
+    maxShutdownDelaySeconds: 30
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: Payment__PublicBaseUrl
+        value: https://dotnetrisk-aschulten.onrender.com

@@ -1,0 +1,6 @@
+**/bin/
+**/obj/
+.git/
+ingresos-chatgpt-assets/
+*.user
+*.suo
