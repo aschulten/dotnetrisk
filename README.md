@@ -4,6 +4,8 @@ Minimal API that turns NuGet and OSV data into a deterministic dependency-risk r
 
 Runtime: .NET 10.
 
+Public API: https://dotnetrisk-aschulten.onrender.com
+
 ## Run
 
 ```powershell

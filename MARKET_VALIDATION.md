@@ -40,4 +40,6 @@ These are hypotheses, not validated prices. Do not count self-payments or test s
 
 ## Gate
 
-The .NET Upgrade Planner MVP is implemented and verified against live NuGet packages. Its x402 v2 payment gate is configured for native USDC on Base mainnet with a public receiving address. PayAI currently advertises support for exact payments, Base mainnet, and the Bazaar extension; its observed Base settlement price was USD 0.00231 per operation on 2026-09-27. Public deployment remains the blocker. Do not implement the license audit before the deployed payment path is functional.
+The .NET Upgrade Planner MVP is deployed at https://dotnetrisk-aschulten.onrender.com and verified against live NuGet packages. Its x402 v2 payment gate is configured for native USDC on Base mainnet with a public receiving address. PayAI currently advertises support for exact payments, Base mainnet, and the Bazaar extension; its observed Base settlement price was USD 0.00231 per operation on 2026-09-27.
+
+The public launch window started on 2026-09-27. Both paid endpoints return valid x402 v2 requirements and reject malformed payments. No self-payment was performed. Do not implement the license audit before the first external purchase.
