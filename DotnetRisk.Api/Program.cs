@@ -20,6 +20,7 @@ var paymentAsset = builder.Configuration["Payment:Asset"]
 var paymentRecipient = builder.Configuration["Payment:PayTo"]
     ?? throw new InvalidOperationException("Payment:PayTo is required.");
 var publicBaseUrl = builder.Configuration["Payment:PublicBaseUrl"]?.TrimEnd('/');
+var discoveryBaseUrl = publicBaseUrl ?? "http://localhost:5000";
 
 builder.Services.AddX402().WithHttpFacilitator(facilitatorUrl);
 builder.Services.AddHttpClient<PackageRiskService>(client =>
@@ -44,6 +45,12 @@ app.MapGet("/health", () => Results.Ok(new
     service = "dotnet-risk",
     timestamp = DateTimeOffset.UtcNow
 }));
+
+app.MapGet("/openapi.json", () => Results.Json(
+    DiscoveryDocument.CreateOpenApi(discoveryBaseUrl, paymentRecipient)));
+
+app.MapGet("/.well-known/x402", () => Results.Json(
+    DiscoveryDocument.CreateWellKnown(discoveryBaseUrl, paymentRecipient)));
 
 app.MapGet("/demo", async (PackageRiskService service, CancellationToken cancellationToken) =>
     Results.Ok(await service.AnalyzeAsync("newtonsoft.json", "12.0.1", cancellationToken)));

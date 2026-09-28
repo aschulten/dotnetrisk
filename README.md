@@ -33,3 +33,5 @@ The upgrade planner downloads package archives only from NuGet.org, limits packa
 The server does not hold a private key. It delegates payment verification and settlement to the configured facilitator, rejects missing or malformed payment payloads with `402`, and only returns the requested result after settlement succeeds.
 
 Production deployment must set `Payment__PublicBaseUrl` to the public HTTPS origin so Bazaar receives an absolute externally reachable resource URL. `Payment__FacilitatorUrl`, `Payment__Network`, `Payment__Asset`, and `Payment__PayTo` can also be overridden through environment variables.
+
+Discovery clients can inspect `/openapi.json` first and fall back to `/.well-known/x402`. Both documents list the paid resources, fixed USD prices, request schemas, and public payment recipient; runtime `402` challenges remain authoritative.

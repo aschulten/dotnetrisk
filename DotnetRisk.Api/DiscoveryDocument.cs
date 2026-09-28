@@ -1,0 +1,131 @@
+using System.Text.Json.Nodes;
+
+namespace DotnetRisk.Api;
+
+internal static class DiscoveryDocument
+{
+    public static JsonObject CreateOpenApi(string baseUrl, string paymentRecipient) => new()
+    {
+        ["openapi"] = "3.0.3",
+        ["info"] = new JsonObject
+        {
+            ["title"] = "DotnetRisk API",
+            ["version"] = "1.0.0",
+            ["description"] = "Paid NuGet security audits and .NET upgrade plans without source-code collection."
+        },
+        ["servers"] = new JsonArray(new JsonObject { ["url"] = baseUrl }),
+        ["x-discovery"] = new JsonObject
+        {
+            ["ownershipProofs"] = new JsonArray(paymentRecipient)
+        },
+        ["paths"] = new JsonObject
+        {
+            ["/v1/upgrade-plans"] = CreatePaidOperation(
+                "Create a .NET upgrade plan",
+                "Analyze NuGet package compatibility for a target framework and return a prioritized upgrade plan.",
+                "0.25",
+                new JsonObject
+                {
+                    ["targetFramework"] = new JsonObject { ["type"] = "string", ["example"] = "net10.0" },
+                    ["packages"] = CreatePackagesSchema(10)
+                },
+                ["targetFramework", "packages"]),
+            ["/v1/audits"] = CreatePaidOperation(
+                "Audit NuGet package security",
+                "Audit exact NuGet package versions for known vulnerabilities and remediation options.",
+                "0.05",
+                new JsonObject
+                {
+                    ["packages"] = CreatePackagesSchema(25)
+                },
+                ["packages"])
+        },
+        ["components"] = new JsonObject
+        {
+            ["securitySchemes"] = new JsonObject
+            {
+                ["x402Payment"] = new JsonObject
+                {
+                    ["type"] = "apiKey",
+                    ["in"] = "header",
+                    ["name"] = "PAYMENT-SIGNATURE",
+                    ["description"] = "x402 v2 payment signature returned after the initial 402 challenge."
+                }
+            }
+        }
+    };
+
+    public static JsonObject CreateWellKnown(string baseUrl, string paymentRecipient) => new()
+    {
+        ["version"] = 1,
+        ["resources"] = new JsonArray(
+            $"{baseUrl}/v1/upgrade-plans",
+            $"{baseUrl}/v1/audits"),
+        ["ownershipProofs"] = new JsonArray(paymentRecipient)
+    };
+
+    private static JsonObject CreatePaidOperation(
+        string summary,
+        string description,
+        string price,
+        JsonObject properties,
+        string[] required) => new()
+    {
+        ["post"] = new JsonObject
+        {
+            ["summary"] = summary,
+            ["description"] = description,
+            ["security"] = new JsonArray(new JsonObject { ["x402Payment"] = new JsonArray() }),
+            ["x-payment-info"] = new JsonObject
+            {
+                ["protocols"] = new JsonArray("x402"),
+                ["price"] = new JsonObject
+                {
+                    ["mode"] = "fixed",
+                    ["currency"] = "USD",
+                    ["amount"] = price
+                }
+            },
+            ["requestBody"] = new JsonObject
+            {
+                ["required"] = true,
+                ["content"] = new JsonObject
+                {
+                    ["application/json"] = new JsonObject
+                    {
+                        ["schema"] = new JsonObject
+                        {
+                            ["type"] = "object",
+                            ["properties"] = properties,
+                            ["required"] = new JsonArray(required.Select(JsonValue.Create).ToArray()),
+                            ["additionalProperties"] = false
+                        }
+                    }
+                }
+            },
+            ["responses"] = new JsonObject
+            {
+                ["200"] = new JsonObject { ["description"] = "Analysis completed." },
+                ["402"] = new JsonObject { ["description"] = "x402 payment required." }
+            }
+        }
+    };
+
+    private static JsonObject CreatePackagesSchema(int maximumItems) => new()
+    {
+        ["type"] = "array",
+        ["minItems"] = 1,
+        ["maxItems"] = maximumItems,
+        ["items"] = new JsonObject
+        {
+            ["type"] = "object",
+            ["properties"] = new JsonObject
+            {
+                ["packageId"] = new JsonObject { ["type"] = "string", ["example"] = "Newtonsoft.Json" },
+                ["version"] = new JsonObject { ["type"] = "string", ["example"] = "12.0.1" }
+            },
+            ["required"] = new JsonArray("packageId", "version"),
+            ["additionalProperties"] = false
+        }
+    };
+}

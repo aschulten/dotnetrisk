@@ -58,6 +58,46 @@ public sealed class PaymentGateTests : IClassFixture<WebApplicationFactory<Progr
             paymentRequired.RootElement.GetProperty("accepts")[0].GetProperty("amount").GetString());
     }
 
+    [Fact]
+    public async Task OpenApi_DeclaresPaidOperationsForDiscovery()
+    {
+        using var response = await client.GetAsync("/openapi.json");
+
+        response.EnsureSuccessStatusCode();
+        using var document = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+        var paths = document.RootElement.GetProperty("paths");
+
+        Assert.Equal(
+            "0.25",
+            paths.GetProperty("/v1/upgrade-plans")
+                .GetProperty("post")
+                .GetProperty("x-payment-info")
+                .GetProperty("price")
+                .GetProperty("amount")
+                .GetString());
+        Assert.Equal(
+            "0.05",
+            paths.GetProperty("/v1/audits")
+                .GetProperty("post")
+                .GetProperty("x-payment-info")
+                .GetProperty("price")
+                .GetProperty("amount")
+                .GetString());
+    }
+
+    [Fact]
+    public async Task WellKnown_ListsBothPaidResources()
+    {
+        using var response = await client.GetAsync("/.well-known/x402");
+
+        response.EnsureSuccessStatusCode();
+        using var document = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+        var resources = document.RootElement.GetProperty("resources");
+
+        Assert.Equal(2, resources.GetArrayLength());
+        Assert.All(resources.EnumerateArray(), resource => Assert.StartsWith("http", resource.GetString()));
+    }
+
     private static JsonDocument DecodePaymentRequired(HttpResponseMessage response)
     {
         Assert.True(response.Headers.TryGetValues("PAYMENT-REQUIRED", out var values));
