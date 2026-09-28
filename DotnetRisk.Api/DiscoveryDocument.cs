@@ -97,7 +97,7 @@ internal static class DiscoveryDocument
                         {
                             ["type"] = "object",
                             ["properties"] = properties,
-                            ["required"] = new JsonArray(required.Select(JsonValue.Create).ToArray()),
+                            ["required"] = new JsonArray(required.Select(value => JsonValue.Create(value)).ToArray()),
                             ["additionalProperties"] = false
                         }
                     }
