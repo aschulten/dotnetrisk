@@ -34,7 +34,10 @@ public sealed class PaymentGateTests : IClassFixture<WebApplicationFactory<Progr
         Assert.Equal(
             "0x9bb8c86df572b0102ab8b99ba9d480d9751457b5",
             requirement.GetProperty("payTo").GetString());
-        Assert.True(paymentRequired.RootElement.GetProperty("extensions").TryGetProperty("bazaar", out _));
+        var bazaar = paymentRequired.RootElement.GetProperty("extensions").GetProperty("bazaar");
+        Assert.True(bazaar.GetProperty("info").TryGetProperty("output", out _));
+        Assert.True(
+            bazaar.GetProperty("schema").GetProperty("properties").TryGetProperty("output", out _));
     }
 
     [Fact]

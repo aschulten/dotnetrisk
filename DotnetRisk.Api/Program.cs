@@ -111,6 +111,14 @@ app.MapPost("/v1/upgrade-plans", async (
         {
             targetFramework = "net10.0",
             packages = new[] { new { packageId = "Newtonsoft.Json", version = "12.0.1" } }
+        },
+        outputExample: new
+        {
+            targetFramework = "net10.0",
+            packageCount = 1,
+            upgradeCount = 1,
+            incompatibleUpgradeCount = 0,
+            actions = Array.Empty<object>()
         }),
     SettlementMode.Pessimistic);
 
@@ -151,6 +159,16 @@ app.MapPost("/v1/audits", async (
         exampleBody: new
         {
             packages = new[] { new { packageId = "Newtonsoft.Json", version = "12.0.1" } }
+        },
+        outputExample: new
+        {
+            packageCount = 1,
+            vulnerablePackageCount = 1,
+            outdatedPackageCount = 1,
+            overallRiskScore = 90,
+            overallRiskLevel = "critical",
+            remediationPlan = Array.Empty<object>(),
+            packages = Array.Empty<object>()
         }),
     SettlementMode.Pessimistic);
 
@@ -191,7 +209,8 @@ PaymentRequiredInfo CreatePaymentRequirement(
     string amount,
     string description,
     string[] tags,
-    object exampleBody) => new()
+    object exampleBody,
+    object outputExample) => new()
 {
     Resource = new ResourceInfoBasic
     {
@@ -213,10 +232,10 @@ PaymentRequiredInfo CreatePaymentRequirement(
         }
     ],
     Discoverable = true,
-    Extensions = CreateBazaarExtension(exampleBody)
+    Extensions = CreateBazaarExtension(exampleBody, outputExample)
 };
 
-Dictionary<string, ExtensionData> CreateBazaarExtension(object exampleBody) => new()
+Dictionary<string, ExtensionData> CreateBazaarExtension(object exampleBody, object outputExample) => new()
 {
     ["bazaar"] = new ExtensionData
     {
@@ -228,6 +247,11 @@ Dictionary<string, ExtensionData> CreateBazaarExtension(object exampleBody) => n
                 method = "POST",
                 bodyType = "json",
                 body = exampleBody
+            },
+            output = new
+            {
+                type = "json",
+                example = outputExample
             }
         },
         Schema = new
@@ -246,10 +270,21 @@ Dictionary<string, ExtensionData> CreateBazaarExtension(object exampleBody) => n
                         body = new { type = "object" }
                     },
                     required = new[] { "type", "method", "bodyType", "body" },
-                    additionalProperties = false
-                }
-            },
-            required = new[] { "input" }
+                        additionalProperties = false
+                    },
+                    output = new
+                    {
+                        type = "object",
+                        properties = new
+                        {
+                            type = new { type = "string", @const = "json" },
+                            example = new { type = "object" }
+                        },
+                        required = new[] { "type", "example" },
+                        additionalProperties = false
+                    }
+                },
+            required = new[] { "input", "output" }
         }
     }
 };
