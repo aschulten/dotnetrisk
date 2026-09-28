@@ -1,6 +1,6 @@
 # DotnetRisk Market Validation
 
-Last updated: 2026-09-27
+Last updated: 2026-09-28
 
 ## Finding
 
@@ -43,3 +43,11 @@ These are hypotheses, not validated prices. Do not count self-payments or test s
 The .NET Upgrade Planner MVP is deployed at https://dotnetrisk-aschulten.onrender.com and verified against live NuGet packages. Its x402 v2 payment gate is configured for native USDC on Base mainnet with a public receiving address. PayAI currently advertises support for exact payments, Base mainnet, and the Bazaar extension; its observed Base settlement price was USD 0.00231 per operation on 2026-09-27.
 
 The public launch window started on 2026-09-27. Both paid endpoints return valid x402 v2 requirements and reject malformed payments. No self-payment was performed. Do not implement the license audit before the first external purchase.
+
+## Discovery status
+
+On 2026-09-28, x402scan's discovery API read the public OpenAPI document, found both paid routes, and registered both without failures or skipped resources. The registered origin is:
+
+- https://www.x402scan.com/server/3effc1bc-b2a6-4927-b747-12b5f91899bc
+
+The 30-day zero-purchase rejection clock starts from this confirmed indexing date, not the initial Render deployment date.
