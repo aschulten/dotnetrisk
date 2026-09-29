@@ -70,6 +70,11 @@ public sealed class PaymentGateTests : IClassFixture<WebApplicationFactory<Progr
         using var document = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
         var paths = document.RootElement.GetProperty("paths");
 
+        Assert.Contains("NuGet", document.RootElement.GetProperty("info").GetProperty("title").GetString());
+        Assert.Equal(
+            "https://github.com/aschulten/dotnetrisk",
+            document.RootElement.GetProperty("info").GetProperty("contact").GetProperty("url").GetString());
+
         Assert.Equal(
             "0.25",
             paths.GetProperty("/v1/upgrade-plans")
@@ -78,6 +83,13 @@ public sealed class PaymentGateTests : IClassFixture<WebApplicationFactory<Progr
                 .GetProperty("price")
                 .GetProperty("amount")
                 .GetString());
+        Assert.Contains(
+            "NuGet",
+            paths.GetProperty("/v1/upgrade-plans")
+                .GetProperty("post")
+                .GetProperty("tags")
+                .EnumerateArray()
+                .Select(tag => tag.GetString()));
         Assert.Equal(
             "0.05",
             paths.GetProperty("/v1/audits")

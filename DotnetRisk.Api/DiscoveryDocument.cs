@@ -9,9 +9,15 @@ internal static class DiscoveryDocument
         ["openapi"] = "3.0.3",
         ["info"] = new JsonObject
         {
-            ["title"] = "DotnetRisk API",
+            ["title"] = "DotnetRisk NuGet Security and .NET Upgrade API",
             ["version"] = "1.0.0",
-            ["description"] = "Paid NuGet security audits and .NET upgrade plans without source-code collection."
+            ["description"] = "Paid NuGet vulnerability audits and .NET target-framework upgrade plans for coding agents. Source code is never collected.",
+            ["contact"] = new JsonObject
+            {
+                ["name"] = "DotnetRisk",
+                ["url"] = "https://github.com/aschulten/dotnetrisk"
+            },
+            ["x-guidance"] = "Choose the security audit for exact-version vulnerability remediation. Choose the upgrade planner for target-framework compatibility and package upgrade ordering. Submit package IDs and versions only."
         },
         ["servers"] = new JsonArray(new JsonObject { ["url"] = baseUrl }),
         ["x-discovery"] = new JsonObject
@@ -24,6 +30,7 @@ internal static class DiscoveryDocument
                 "Create a .NET upgrade plan",
                 "Analyze NuGet package compatibility for a target framework and return a prioritized upgrade plan.",
                 "0.25",
+                [".NET", "NuGet", "package upgrade", "compatibility"],
                 new JsonObject
                 {
                     ["targetFramework"] = new JsonObject { ["type"] = "string", ["example"] = "net10.0" },
@@ -34,6 +41,7 @@ internal static class DiscoveryDocument
                 "Audit NuGet package security",
                 "Audit exact NuGet package versions for known vulnerabilities and remediation options.",
                 "0.05",
+                [".NET", "NuGet", "dependency security", "vulnerability"],
                 new JsonObject
                 {
                     ["packages"] = CreatePackagesSchema(25)
@@ -68,6 +76,7 @@ internal static class DiscoveryDocument
         string summary,
         string description,
         string price,
+        string[] tags,
         JsonObject properties,
         string[] required) => new()
     {
@@ -75,6 +84,7 @@ internal static class DiscoveryDocument
         {
             ["summary"] = summary,
             ["description"] = description,
+            ["tags"] = new JsonArray(tags.Select(value => JsonValue.Create(value)).ToArray()),
             ["security"] = new JsonArray(new JsonObject { ["x402Payment"] = new JsonArray() }),
             ["x-payment-info"] = new JsonObject
             {
