@@ -62,7 +62,7 @@ app.MapGet("/demo", async (PackageRiskService service, CancellationToken cancell
 app.MapGet("/product", () => Results.Ok(new
 {
     product = "DotnetRisk",
-    nugetAuditPriceUsd = 0.05m,
+    nugetAuditPriceUsd = 0.01m,
     upgradePlanPriceUsd = 0.25m,
     maximumPackages = PackageInput.MaximumProjectPackages,
     input = "NuGet package IDs and versions only; source code is not collected.",
@@ -157,7 +157,7 @@ app.MapPost("/v1/audits", async (
 .RequireX402Payment(
     CreatePaymentRequirement(
         path: "/v1/audits",
-        amount: "50000",
+        amount: "10000",
         description: "Audit NuGet package versions for known vulnerabilities and return a prioritized remediation plan.",
         tags: ["dotnet", "nuget", "security", "vulnerability"],
         exampleBody: new

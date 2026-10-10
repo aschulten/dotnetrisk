@@ -6,7 +6,7 @@ All offers share one API, deployment, payment rail, cache, documentation surface
 
 | Priority | Offer | Input | Output | Target price |
 |---|---|---|---|---:|
-| 1 | NuGet Security Audit | Package IDs and versions | Vulnerabilities and remediation order | USD 0.05 |
+| 1 | NuGet Security Audit | Package IDs and versions | Vulnerabilities and remediation order | USD 0.01 |
 | 2 | .NET Upgrade Planner | Target framework and packages | Compatibility and upgrade plan | USD 0.25 |
 | 3 | License Risk Audit | Package IDs and versions | License obligations and conflicts | USD 0.10 |
 

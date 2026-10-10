@@ -40,7 +40,7 @@ internal static class DiscoveryDocument
             ["/v1/audits"] = CreatePaidOperation(
                 "Audit NuGet package security",
                 "Audit exact NuGet package versions for known vulnerabilities and remediation options.",
-                "0.05",
+                "0.01",
                 [".NET", "NuGet", "dependency security", "vulnerability"],
                 new JsonObject
                 {
@@ -94,8 +94,8 @@ internal static class DiscoveryDocument
                 $"{baseUrl}/v1/audits",
                 "Audit NuGet package security",
                 "Audit exact NuGet package versions for known vulnerabilities and remediation options.",
-                "50000",
-                "0.05",
+                "10000",
+                "0.01",
                 ["dotnet", "nuget", "security", "vulnerability"],
                 paymentRecipient,
                 paymentNetwork,

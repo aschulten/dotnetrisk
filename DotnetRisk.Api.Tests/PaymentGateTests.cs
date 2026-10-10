@@ -57,7 +57,7 @@ public sealed class PaymentGateTests : IClassFixture<WebApplicationFactory<Progr
         Assert.Equal(HttpStatusCode.PaymentRequired, response.StatusCode);
         using var paymentRequired = DecodePaymentRequired(response);
         Assert.Equal(
-            "50000",
+            "10000",
             paymentRequired.RootElement.GetProperty("accepts")[0].GetProperty("amount").GetString());
     }
 
@@ -91,7 +91,7 @@ public sealed class PaymentGateTests : IClassFixture<WebApplicationFactory<Progr
                 .EnumerateArray()
                 .Select(tag => tag.GetString()));
         Assert.Equal(
-            "0.05",
+            "0.01",
             paths.GetProperty("/v1/audits")
                 .GetProperty("post")
                 .GetProperty("x-payment-info")
@@ -138,7 +138,7 @@ public sealed class PaymentGateTests : IClassFixture<WebApplicationFactory<Progr
             "250000",
             resources[0].GetProperty("accepts")[0].GetProperty("amount").GetString());
         Assert.Equal(
-            "50000",
+            "10000",
             resources[1].GetProperty("accepts")[0].GetProperty("amount").GetString());
     }
 

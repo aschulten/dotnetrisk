@@ -20,7 +20,7 @@ Open `/swagger`, `/demo`, request `/v1/risk/{packageId}/{version}`, submit up to
 - Latest stable version lookup through NuGet.
 - Six-hour in-memory cache.
 - No repository uploads or source-code collection.
-- Project-level remediation report designed for a USD 0.05 NuGet-specific acquisition offer.
+- Project-level remediation report priced at USD 0.01 so new buyers can test the service with minimal risk.
 
 The differentiated paid target is a USD 0.25 .NET upgrade plan. See `MARKET_VALIDATION.md` for current evidence and pricing assumptions.
 
