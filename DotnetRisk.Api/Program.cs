@@ -50,7 +50,11 @@ app.MapGet("/openapi.json", () => Results.Json(
     DiscoveryDocument.CreateOpenApi(discoveryBaseUrl, paymentRecipient)));
 
 app.MapGet("/.well-known/x402", () => Results.Json(
-    DiscoveryDocument.CreateWellKnown(discoveryBaseUrl, paymentRecipient)));
+    DiscoveryDocument.CreateWellKnown(
+        discoveryBaseUrl,
+        paymentRecipient,
+        paymentNetwork,
+        paymentAsset)));
 
 app.MapGet("/demo", async (PackageRiskService service, CancellationToken cancellationToken) =>
     Results.Ok(await service.AnalyzeAsync("newtonsoft.json", "12.0.1", cancellationToken)));

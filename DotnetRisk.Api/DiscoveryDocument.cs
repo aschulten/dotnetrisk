@@ -63,13 +63,77 @@ internal static class DiscoveryDocument
         }
     };
 
-    public static JsonObject CreateWellKnown(string baseUrl, string paymentRecipient) => new()
+    public static JsonObject CreateWellKnown(
+        string baseUrl,
+        string paymentRecipient,
+        string paymentNetwork,
+        string paymentAsset) => new()
     {
         ["version"] = 1,
+        ["x402Version"] = 2,
+        ["name"] = "DotnetRisk",
+        ["description"] = "Paid NuGet vulnerability audits and .NET upgrade plans for coding agents.",
+        ["networks"] = new JsonArray(paymentNetwork),
+        ["payTo"] = paymentRecipient,
+        ["payToByNetwork"] = new JsonObject
+        {
+            [paymentNetwork] = paymentRecipient
+        },
         ["resources"] = new JsonArray(
-            $"{baseUrl}/v1/upgrade-plans",
-            $"{baseUrl}/v1/audits"),
+            CreatePaidResource(
+                $"{baseUrl}/v1/upgrade-plans",
+                "Create a .NET upgrade plan",
+                "Analyze NuGet package compatibility for a target framework and return a prioritized upgrade plan.",
+                "250000",
+                "0.25",
+                ["dotnet", "nuget", "upgrade", "compatibility"],
+                paymentRecipient,
+                paymentNetwork,
+                paymentAsset),
+            CreatePaidResource(
+                $"{baseUrl}/v1/audits",
+                "Audit NuGet package security",
+                "Audit exact NuGet package versions for known vulnerabilities and remediation options.",
+                "50000",
+                "0.05",
+                ["dotnet", "nuget", "security", "vulnerability"],
+                paymentRecipient,
+                paymentNetwork,
+                paymentAsset)),
         ["ownershipProofs"] = new JsonArray(paymentRecipient)
+    };
+
+    private static JsonObject CreatePaidResource(
+        string resource,
+        string name,
+        string description,
+        string amount,
+        string priceUsd,
+        string[] tags,
+        string paymentRecipient,
+        string paymentNetwork,
+        string paymentAsset) => new()
+    {
+        ["resource"] = resource,
+        ["name"] = name,
+        ["description"] = description,
+        ["method"] = "POST",
+        ["price"] = $"${priceUsd}",
+        ["tags"] = new JsonArray(tags.Select(value => JsonValue.Create(value)).ToArray()),
+        ["accepts"] = new JsonArray(new JsonObject
+        {
+            ["scheme"] = "exact",
+            ["network"] = paymentNetwork,
+            ["asset"] = paymentAsset,
+            ["amount"] = amount,
+            ["payTo"] = paymentRecipient,
+            ["maxTimeoutSeconds"] = 60,
+            ["extra"] = new JsonObject
+            {
+                ["name"] = "USD Coin",
+                ["version"] = "2"
+            }
+        })
     };
 
     private static JsonObject CreatePaidOperation(

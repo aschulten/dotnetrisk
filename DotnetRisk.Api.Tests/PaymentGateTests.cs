@@ -101,7 +101,7 @@ public sealed class PaymentGateTests : IClassFixture<WebApplicationFactory<Progr
     }
 
     [Fact]
-    public async Task WellKnown_ListsBothPaidResources()
+    public async Task WellKnown_DeclaresRoutablePaymentMetadataForBothResources()
     {
         using var response = await client.GetAsync("/.well-known/x402");
 
@@ -109,8 +109,37 @@ public sealed class PaymentGateTests : IClassFixture<WebApplicationFactory<Progr
         using var document = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
         var resources = document.RootElement.GetProperty("resources");
 
+        Assert.Equal(2, document.RootElement.GetProperty("x402Version").GetInt32());
+        Assert.Contains(
+            "eip155:8453",
+            document.RootElement.GetProperty("networks")
+                .EnumerateArray()
+                .Select(network => network.GetString()));
+        Assert.Equal(
+            "0x9bb8c86df572b0102ab8b99ba9d480d9751457b5",
+            document.RootElement.GetProperty("payTo").GetString());
         Assert.Equal(2, resources.GetArrayLength());
-        Assert.All(resources.EnumerateArray(), resource => Assert.StartsWith("http", resource.GetString()));
+        Assert.All(resources.EnumerateArray(), resource =>
+        {
+            Assert.StartsWith("http", resource.GetProperty("resource").GetString());
+            Assert.Equal("POST", resource.GetProperty("method").GetString());
+
+            var accepts = resource.GetProperty("accepts");
+            var requirement = Assert.Single(accepts.EnumerateArray());
+            Assert.Equal("exact", requirement.GetProperty("scheme").GetString());
+            Assert.Equal("eip155:8453", requirement.GetProperty("network").GetString());
+            Assert.Equal(
+                "0x9bb8c86df572b0102ab8b99ba9d480d9751457b5",
+                requirement.GetProperty("payTo").GetString());
+            Assert.Equal("USD Coin", requirement.GetProperty("extra").GetProperty("name").GetString());
+        });
+
+        Assert.Equal(
+            "250000",
+            resources[0].GetProperty("accepts")[0].GetProperty("amount").GetString());
+        Assert.Equal(
+            "50000",
+            resources[1].GetProperty("accepts")[0].GetProperty("amount").GetString());
     }
 
     private static JsonDocument DecodePaymentRequired(HttpResponseMessage response)
